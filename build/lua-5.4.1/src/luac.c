@@ -35,10 +35,10 @@ static void PrintFunction(const Proto* f, int full);
 static int listing=0;			/* list bytecodes? */
 static int dumping=1;			/* dump bytecodes? */
 static int stripping=0;			/* strip debug information? */
+static int strippingFileName = 0;
 static char Output[]={ OUTPUT };	/* default output file name */
 static const char* output=Output;	/* actual output file name */
 static const char* progname=PROGNAME;	/* actual program name */
-static const char *s_overrideFileName = NULL;
 static TString **tmname;
 
 static void fatal(const char* message)
@@ -105,14 +105,10 @@ static int doargs(int argc, char* argv[])
    dumping=0;
   else if (IS("-s"))			/* strip debug information */
    stripping=1;
+  else if (IS("-S"))
+   strippingFileName=1;
   else if (IS("-v"))			/* show version */
    ++version;
-  else if (IS("-n"))
-  {
-    s_overrideFileName = argv[++i];
-	if (s_overrideFileName == NULL || *s_overrideFileName == 0 || (*s_overrideFileName == '-' && s_overrideFileName[1] != 0))
-	  usage("'-n' needs argument");
-  }
   else					/* unknown option */
    usage(argv[i]);
  }
@@ -174,13 +170,13 @@ static int writer(lua_State* L, const void* p, size_t size, void* u)
  return (fwrite(p,size,1,(FILE*)u)!=1) && (size!=0);
 }
 
-static void DoOverrideFileName(Proto *f, TString *overrideFileName)
+static void DoStrippingFileName(Proto *f)
 {
  if (f == NULL)
   return;
- f->source = overrideFileName;
+ f->source = NULL;
  for (int i = 0; i < f->sizep; ++i)
-  DoOverrideFileName(f->p[i], overrideFileName);
+  DoStrippingFileName(f->p[i]);
 }
 
 static int pmain(lua_State* L)
@@ -188,7 +184,6 @@ static int pmain(lua_State* L)
  int argc=(int)lua_tointeger(L,1);
  char** argv=(char**)lua_touserdata(L,2);
  const Proto* f;
- TString *overrideFileName;
  int i;
  tmname=G(L)->tmname;
  if (!lua_checkstack(L,argc)) fatal("too many input files");
@@ -198,11 +193,8 @@ static int pmain(lua_State* L)
   if (luaL_loadfile(L,filename)!=LUA_OK) fatal(lua_tostring(L,-1));
  }
  f=combine(L,argc);
- if (s_overrideFileName)
- {
-  overrideFileName = luaS_new(L, s_overrideFileName);
-  DoOverrideFileName((Proto *)f, overrideFileName);
- }
+ if (strippingFileName)
+  DoStrippingFileName((Proto *)f);
  if (listing) luaU_print(f,listing>1);
  if (dumping)
  {
