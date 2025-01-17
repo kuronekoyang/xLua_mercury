@@ -36,6 +36,7 @@ static int listing=0;			/* list bytecodes? */
 static int dumping=1;			/* dump bytecodes? */
 static int stripping=0;			/* strip debug information? */
 static int strippingFileName = 0;
+static const char* overrideFileName = NULL;
 static char Output[]={ OUTPUT };	/* default output file name */
 static const char* output=Output;	/* actual output file name */
 static const char* progname=PROGNAME;	/* actual program name */
@@ -107,6 +108,12 @@ static int doargs(int argc, char* argv[])
    stripping=1;
   else if (IS("-S"))
    strippingFileName=1;
+  else if (IS("-O"))			/* output file */
+  {
+   overrideFileName=argv[++i];
+   if (overrideFileName==NULL || *overrideFileName==0 || (*overrideFileName=='-' && overrideFileName[1]!=0))
+    overrideFileName=NULL;
+  }
   else if (IS("-v"))			/* show version */
    ++version;
   else					/* unknown option */
@@ -179,6 +186,15 @@ static void DoStrippingFileName(Proto *f)
   DoStrippingFileName(f->p[i]);
 }
 
+static void DoOverrideFileName(Proto *f, TString* overrideFileNameTString)
+{
+ if (f == NULL)
+  return;
+ f->source = overrideFileNameTString;
+ for (int i = 0; i < f->sizep; ++i)
+  DoOverrideFileName(f->p[i], overrideFileNameTString);
+}
+
 static int pmain(lua_State* L)
 {
  int argc=(int)lua_tointeger(L,1);
@@ -195,6 +211,11 @@ static int pmain(lua_State* L)
  f=combine(L,argc);
  if (strippingFileName)
   DoStrippingFileName((Proto *)f);
+ if (overrideFileName)
+ {
+	TString* overrideFileNameTString = luaS_new(L, overrideFileName);
+	DoOverrideFileName((Proto*)f, overrideFileNameTString);
+ }
  if (listing) luaU_print(f,listing>1);
  if (dumping)
  {
