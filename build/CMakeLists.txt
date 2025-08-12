@@ -4,7 +4,7 @@
 # http://opensource.org/licenses/MIT
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT" CACHE STRING "")
@@ -33,9 +33,10 @@ find_path(XLUA_PROJECT_DIR NAMES SConstruct
 
 MARK_AS_ADVANCED(XLUA_PROJECT_DIR)
 
-if (NOT LUA_VERSION)
-    set(LUA_VERSION "5.3.5")
-endif()
+#if (NOT LUA_VERSION)
+#    set(LUA_VERSION "5.3.5")
+#endif()
+set(LUA_VERSION "5.4.1")
 
 set(LUA_SRC_PATH lua-${LUA_VERSION}/src)
 set(LUAJIT_SRC_PATH luajit-2.1.0b3/src)
@@ -119,6 +120,22 @@ set ( XLUA_CORE
 
 if (NOT USING_LUAJIT)
     list (APPEND XLUA_CORE memory_leak_checker.c)
+endif ( )
+
+
+if ( USING_LX )
+    include_directories(
+            lx/
+    )
+    list (REMOVE_ITEM LUA_CORE ${LUA_SRC_PATH}/ltable.c)
+    list (REMOVE_ITEM LUA_CORE ${LUA_SRC_PATH}/ldo.c)
+    list (REMOVE_ITEM LUA_CORE ${LUA_SRC_PATH}/lapi.c)
+    list (APPEND LUA_CORE lx/lx_math.c)
+    list (APPEND LUA_CORE lx/lx_vector2.c)
+    list (APPEND LUA_CORE lx/lx_table.c)
+    list (APPEND LUA_CORE lx/lx_do.c)
+    list (APPEND LUA_CORE lx/lx_api.c)
+    list (APPEND LUA_CORE lx/lxlib.c)
 endif ( )
 
 macro(source_group_by_dir proj_dir source_files)
