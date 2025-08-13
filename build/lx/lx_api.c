@@ -75,7 +75,7 @@ LUA_API void lx_table_capacity(lua_State *L, int idx, unsigned int *array_size, 
 LUA_API void lx_table_size(lua_State *L, int idx, unsigned int *array_size, unsigned int *hash_size)
 {
     lua_lock(L);
-    const Table *t = gettable(L, idx);
+    Table *t = gettable(L, idx);
     lxH_size(L, t, array_size, hash_size);
     lua_unlock(L);
 }

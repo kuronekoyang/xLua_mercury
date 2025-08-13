@@ -1,36 +1,44 @@
+set MINGW64_PATH=D:\msys64\mingw64
+:: set MINGW32_PATH=D:\msys64\mingw32
 
-set "__VS=Visual Studio 16 2019"
-set "__VSWhere=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-set "__VSDISPLAY="
-set "__VSVER="
-
-if exist "%__VSWhere%" (
-	for /f "tokens=*" %%p in (
-		'"%__VSWhere%" -latest -property catalog_productLineVersion'
-	) do set __VSDISPLAY=%%p
-
-	for /f "tokens=*" %%p in (
-		'"%__VSWhere%" -latest -property catalog_productDisplayVersion'
-	) do set __VSVER=%%p
+:: 检查MinGW路径是否存在
+if not exist "%MINGW64_PATH%\bin\gcc.exe" (
+    echo Error: MinGW64 not found at %MINGW64_PATH%
+    pause
+    exit /b 1
 )
+:: if not exist "%MINGW32_PATH%\bin\gcc.exe" (
+::     echo Error: MinGW32 not found at %MINGW32_PATH%
+::     pause
+::     exit /b 1
+:: )
 
-if "%__VSVER%" neq "" (	
-	set __VS=Visual Studio %__VSVER:~0,2% %__VSDisplay%
-)
+:: 设置环境变量
+set PATH=%MINGW64_PATH%\bin;%PATH%
 
-
-mkdir build64_54 & pushd build64_54
-cmake -DLUA_VERSION=5.4.1 -DUSING_LX=ON -G "%__VS%" -A x64  ..
+:: 64位构建
+mkdir build64_54
+pushd build64_54
+cmake -DLUA_VERSION=5.4.1 -DUSING_LX=ON -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%MINGW64_PATH%/bin/gcc.exe -DCMAKE_CXX_COMPILER=%MINGW64_PATH%/bin/g++.exe ..
+mingw32-make
 popd
-cmake --build build64_54 --config Release
+
+:: 创建目录并复制64位dll
 md plugin_lua54\Plugins\x86_64
-copy /Y build64_54\Release\xlua.dll plugin_lua54\Plugins\x86_64\xlua.dll
+copy /Y build64_54\libxlua.dll plugin_lua54\Plugins\x86_64\xlua.dll
 
-mkdir build32_54 & pushd build32_54
-cmake -DLUA_VERSION=5.4.1 -DUSING_LX=ON -G "%__VS%" -A Win32 ..
-popd
-cmake --build build32_54 --config Release
-md plugin_lua54\Plugins\x86
-copy /Y build32_54\Release\xlua.dll plugin_lua54\Plugins\x86\xlua.dll
+:: :: 设置环境变量为32位
+:: set PATH=%MINGW32_PATH%\bin;%PATH%
+::
+:: :: 32位构建
+:: mkdir build32_54
+:: pushd build32_54
+:: cmake -DLUA_VERSION=5.4.1 -DUSING_LX=ON -G "MinGW Makefiles" -DCMAKE_C_COMPILER=%MINGW32_PATH%/bin/gcc.exe -DCMAKE_CXX_COMPILER=%MINGW32_PATH%/bin/g++.exe ..
+:: mingw32-make
+:: popd
+::
+:: :: 创建目录并复制32位dll
+:: md plugin_lua54\Plugins\x86
+:: copy /Y build32_54\xlua.dll plugin_lua54\Plugins\x86\xlua.dll
 
 pause
