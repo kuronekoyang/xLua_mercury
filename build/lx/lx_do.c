@@ -19,7 +19,7 @@ LUAI_FUNC int lxD_is_empty_func(StkId func)
     }
 }
 
-LUAI_FUNC int lxtD_is_callable(lua_State *L, StkId func)
+LUAI_FUNC int lxD_is_callable(lua_State *L, StkId func)
 {
     switch (ttype(s2v(func)))
     {
