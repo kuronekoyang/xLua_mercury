@@ -38,12 +38,12 @@ LUA_API void lx_table_clear_int_keys(lua_State *L, int idx)
     lua_unlock(L);
 }
 
-LUA_API void lx_table_try_grow(lua_State *L, int idx, int refIdx)
+LUA_API void lx_table_grow_to_target(lua_State *L, int idx, int targetIdx)
 {
     lua_lock(L);
     Table *t = gettable(L, idx);
-    Table *tref = gettable(L, refIdx);
-    lxH_try_grow(L, t, tref);
+    const Table *target = gettable(L, targetIdx);
+    lxH_grow_to_target(L, t, target);
     lua_unlock(L);
 }
 

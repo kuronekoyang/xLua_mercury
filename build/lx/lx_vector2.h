@@ -10,7 +10,8 @@ typedef struct
     double y;
 } Vector2;
 
-#define lx_vec2_zero ((Vector2){.x = 0, .y = 0})
+#define lx_vec2_zero lx_vec_zero(2)
+#define lx_vec2_clear(a) lx_vec_clear(2, a)
 
 #define lx_vec2_add(a, b) lx_vec_add(2, a, b)
 #define lx_vec2_sub(a, b) lx_vec_sub(2, a, b)
@@ -44,28 +45,28 @@ typedef struct
 #define lx_vec2_sqr_magnitude(v) lx_vec_sqr_magnitude(2, v)
 #define lx_vec2_magnitude(v) lx_vec_magnitude(2, v)
 
-#define lx_vec2_cross(a, b) ((a)->x * (b)->y - (a)->y * (b)->x)
-
 #define lx_vec2_normalize(v) lx_vec_normalize(2, v)
 #define lx_vec2_normalize_r(v, r) lx_vec_normalize_r(2, v, r)
 
-#define lx_vec2_distance(a, b)                                                                                         \
-    ({                                                                                                                 \
-        Vector2 __lx_vec2_t = lx_vec2_sub(a, b);                                                                       \
-        lx_vec2_magnitude(&__lx_vec2_t);                                                                               \
-    })
-#define lx_vec2_reflect(a, b)    lx_vec_reflect(2, a, b)
-#define lx_vec2_project(a, b)   lx_vec_project(2, a, b)
-#define lx_vec2_project_on_plane(a, b)    lx_vec_project_on_plane(2, a, b)
-    //
-    // ({                                                                                                                 \
-    //     Vector2 __lx_vec2_p = lx_vec2_project(a, b);                                                                   \
-    //     __lx_vec2_p.x = (a)->x - __lx_vec2_p.x;                                                                        \
-    //     __lx_vec2_p.y = (a)->y - __lx_vec2_p.y;                                                                        \
-    //     __lx_vec2_p;                                                                                                   \
-    // })
+#define lx_vec2_distance(a, b) lx_vec_distance(2, a, b)
+#define lx_vec2_direction(a, b) lx_vec_direction(2, a, b)
+#define lx_vec2_reflect(a, b) lx_vec_reflect(2, a, b)
+#define lx_vec2_project(a, b) lx_vec_project(2, a, b)
+#define lx_vec2_project_on_plane(a, b) lx_vec_project_on_plane(2, a, b)
 
-double lx_vec2_angle_rad(const Vector2 *a, const Vector2 *b);
-double lx_vec2_angle_rad_ccw(const Vector2 *a, const Vector2 *b);
+#define lx_vec2_cross(a, b) ((a)->x * (b)->y - (a)->y * (b)->x)
+
+#define lx_vec2_angle_rad(a, b) lx_vec_angle_rad(2, a, b)
+#define lx_vec2_angle_deg(a, b) (lx_vec2_angle_rad(a, b)) * lx_rad2deg
+double lx_vec2_signed_angle_rad(const Vector2 *a, const Vector2 *b);
+#define lx_vec2_signed_angle_deg(a, b) lx_vec2_signed_angle_rad(a, b) * lx_rad2deg
+#define lx_vec2_rotate_rad(a, angle)                                                                                   \
+    ({                                                                                                                 \
+        double __r = -(angle);                                                                                           \
+        double __sin = lx_math_sin(__r);                                                                               \
+        double __cos = lx_math_cos(__r);                                                                               \
+        ((Vector2){.x = __cos * (a)->x - __sin * (a)->y, .y = __sin * (a)->x + __cos * (a)->y});                       \
+    })
+#define lx_vec2_rotate_deg(a, angle) lx_vec2_rotate_rad(a, angle * lx_rad2deg)
 
 #endif

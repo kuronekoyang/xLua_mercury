@@ -1,6 +1,7 @@
 #include "lauxlib.h"
 #include "lua.h"
 #include "lx_api.h"
+#include "lxlib.h"
 
 static int table_clear(lua_State *L)
 {
@@ -35,7 +36,7 @@ static int table_clear_int_keys(lua_State *L)
     return 1;
 }
 
-static int table_try_grow(lua_State *L)
+static int table_grow_to_target(lua_State *L)
 {
     luaL_checktype(L, 1, LUA_TTABLE);
     luaL_checktype(L, 2, LUA_TTABLE);
@@ -43,7 +44,7 @@ static int table_try_grow(lua_State *L)
     if (!lua_rawequal(L, 1, 2))
     {
         lua_settop(L, 2);
-        lx_table_try_grow(L, 1, 2);
+        lx_table_grow_to_target(L, 1, 2);
     }
     lua_pushvalue(L, 1);
     return 1;
@@ -122,7 +123,7 @@ static int table_copy(lua_State *L)
     if (!lua_rawequal(L, 1, 2))
     {
         lua_settop(L, 2);
-        lx_table_try_grow(L, 1, 2);
+        lx_table_grow_to_target(L, 1, 2);
         lua_pushnil(L);
         while (lua_next(L, 2))
         {
@@ -292,20 +293,21 @@ static int table_is_empty(lua_State *L)
     return 1;
 }
 
-static const luaL_Reg lxlib_table[] = {{"clear", table_clear},
-                                       {"clear_array", table_clear_array},
-                                       {"clear_hash", table_clear_hash},
-                                       {"clear_int_keys", table_clear_int_keys},
-                                       {"trygrow", table_try_grow},
-                                       {"grow", table_grow},
-                                       {"shrink", table_shrink},
-                                       {"capacity", table_capacity},
-                                       {"size", table_size},
-                                       {"pack", table_pack},
-                                       {"copy", table_copy},
-                                       {"lower_bound", table_lower_bound},
-                                       {"upper_bound", table_upper_bound},
-                                       {"is_empty", table_is_empty},
+static const luaL_Reg lxlib_table[] = {lxlib_reg_pair(table, clear),
+                                       lxlib_reg_pair(table, clear_array),
+                                       lxlib_reg_pair(table, clear_hash),
+                                       lxlib_reg_pair(table, clear_int_keys),
+                                       lxlib_reg_pair(table, grow_to_target),
+                                       lxlib_reg_pair(table, grow),
+                                       lxlib_reg_pair(table, shrink),
+                                       lxlib_reg_pair(table, capacity),
+                                       lxlib_reg_pair(table, size),
+                                       lxlib_reg_pair(table, pack),
+                                       lxlib_reg_pair(table, copy),
+                                       lxlib_reg_pair(table, lower_bound),
+                                       lxlib_reg_pair(table, upper_bound),
+                                       lxlib_reg_pair(table, is_empty),
+
                                        {NULL, NULL}};
 
 static void lxlib_reg_table(lua_State *L)

@@ -47,12 +47,12 @@ LUAI_FUNC void lxH_clear_int_keys(Table *t)
     }
 }
 
-LUAI_FUNC void lxH_try_grow(lua_State *L, Table *t, Table *tref)
+LUAI_FUNC void lxH_grow_to_target(lua_State *L, Table *t, const Table *target)
 {
     const unsigned int nsize = (unsigned int)allocsizenode(t);
-    const unsigned int nsizeref = (unsigned int)allocsizenode(tref);
+    const unsigned int nsizeref = (unsigned int)allocsizenode(target);
     const unsigned int nasize = luaH_realasize(t);
-    const unsigned int nasizeref = luaH_realasize(tref);
+    const unsigned int nasizeref = luaH_realasize(target);
     if (nsize < nsizeref || nasize < nasizeref)
         luaH_resize(L, t, nasize < nasizeref ? nasizeref : nasize, nsize < nsizeref ? nsizeref : nsize);
 }

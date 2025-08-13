@@ -13,7 +13,7 @@ LUA_API void lx_table_clear(lua_State *L, int idx);
 LUA_API void lx_table_clear_array(lua_State *L, int idx);
 LUA_API void lx_table_clear_hash(lua_State *L, int idx);
 LUA_API void lx_table_clear_int_keys(lua_State *L, int idx);
-LUA_API void lx_table_try_grow(lua_State *L, int idx, int refIdx);
+LUA_API void lx_table_grow_to_target(lua_State *L, int idx, int targetIdx);
 LUA_API void lx_table_grow(lua_State *L, int idx, unsigned int array_size, unsigned int hash_size);
 LUA_API void lx_table_shrink(lua_State *L, int idx);
 LUA_API void lx_table_capacity(lua_State *L, int idx, unsigned int *array_size, unsigned int *hash_size);

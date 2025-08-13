@@ -1,6 +1,7 @@
 #include "lauxlib.h"
 #include "lua.h"
 #include "lx_math.h"
+#include "lxlib.h"
 
 static int math_clamp(lua_State *L)
 {
@@ -149,19 +150,19 @@ static int math_sqr_distance_3d(lua_State *L)
     return 1;
 }
 
-static const luaL_Reg lxlib_math[] = {{"clamp", math_clamp},
-                                      {"clamp01", math_clamp01},
-                                      {"lerp_unclamped", math_lerp_unclamped},
-                                      {"lerp", math_lerp},
-                                      {"next_pow2", math_next_pow2},
-                                      {"integer", math_integer},
-                                      {"round", math_round},
-                                      {"sign", math_sign},
-                                      {"approx", math_approx},
-                                      {"distance_2d", math_distance_2d},
-                                      {"sqr_distance_2d", math_sqr_distance_2d},
-                                      {"distance_3d", math_distance_3d},
-                                      {"sqr_distance_3d", math_sqr_distance_3d},
+static const luaL_Reg lxlib_math[] = {lxlib_reg_pair(math, clamp),
+                                      lxlib_reg_pair(math, clamp01),
+                                      lxlib_reg_pair(math, lerp_unclamped),
+                                      lxlib_reg_pair(math, lerp),
+                                      lxlib_reg_pair(math, next_pow2),
+                                      lxlib_reg_pair(math, integer),
+                                      lxlib_reg_pair(math, round),
+                                      lxlib_reg_pair(math, sign),
+                                      lxlib_reg_pair(math, approx),
+                                      lxlib_reg_pair(math, distance_2d),
+                                      lxlib_reg_pair(math, sqr_distance_2d),
+                                      lxlib_reg_pair(math, distance_3d),
+                                      lxlib_reg_pair(math, sqr_distance_3d),
 
                                       {NULL, NULL}};
 
